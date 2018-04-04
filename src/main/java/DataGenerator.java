@@ -1,7 +1,4 @@
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
+import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.utils.UUIDs;
@@ -21,7 +18,7 @@ public class DataGenerator {
 
             client.connect(CONTACT_POINTS, PORT);
             client.createSchema();
-            client.loadData();
+            client.loadData2();
 
         } finally {
             client.close();
@@ -85,16 +82,20 @@ public class DataGenerator {
     /**
      * Inserts data into the tables.
      */
-    public void loadData() {
+
+    public void loadData2() {
 
         for (int i=0; i<numRecords; i++) {
-            Insert insert = QueryBuilder.insertInto("latency_check", "kvp")
-                    .value("id", UUIDs.random())
-                    .value("nanosec", getCurrentTime());
 
-            //System.out.println(insert.toString());
-            ResultSet result = session.execute(insert.toString());
-            //System.out.println(result);
+            PreparedStatement preparedStatement = session.prepare("insert into latency_check.kvp (id, nanosec) values (?, ?)");
+
+            try {
+                BoundStatement boundStatement = preparedStatement.bind(UUIDs.random(), getCurrentTime());
+                ResultSet rs = session.execute(boundStatement);
+                //System.out.println(rs);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
