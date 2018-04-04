@@ -8,7 +8,7 @@ public class DataGenerator {
 
     static String[] CONTACT_POINTS = {"127.0.0.1"};
     static int PORT = 9042;
-    static int numRecords = 100;
+    static int numRecords = 10;
 
     public static void main(String[] args) {
 
